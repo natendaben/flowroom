@@ -6,65 +6,202 @@ ATLAS Institute, 2020
 Serial Port Interface adapted from Arielle Hein, adapted from ITP Phys Comp Serial Labs
 */
 
+
+//Variables for sounds
 let beach;
 let desert;
 let forest;
 let thunderstorm;
 let underwater;
 
+var serial;
+var portName = '/dev/tty.usbmodem14101';
+var incoming;
+var data;
+var previous = 0;
+var delayInSeconds = 3;
+var delayInMillis = 3000;
+var colorMode = 3; // number between 1 - 5
+
+var active = true;
+
+////// COLOR STUFF
+var R1, G1, B1;
+var R2, G2, B2;
+var R3, G3, B3;
+var R4, G4, B4;
+var colorMode = 3; // must be a value between 1 - 5
+
+if(colorMode == 1){ // desert
+  R1 = 194;
+  G1 = 91;
+  B1 = 59;
+  R2 = 223;
+  G2 = 197;
+  B2 = 158;
+  R3 = 234;
+  G3 = 157;
+  B3 = 86;
+  R4 = 141;
+  G4 = 125;
+  B4 = 154;
+} else if(colorMode == 2){ // beach
+  R1 = 117;
+  G1 = 192;
+  B1 = 220;
+  R2 = 181;
+  G2 = 226;
+  B2 = 216;
+  R3 = 150;
+  G3 = 183;
+  B3 = 172;
+  R4 = 128;
+  G4 = 202;
+  B4 = 196;
+} else if(colorMode == 3){ // ocean
+  R1 = 18;
+  G1 = 55;
+  B1 = 80;
+  R2 = 189;
+  G2 = 203;
+  B2 = 212;
+  R3 = 76;
+  G3 = 132;
+  B3 = 165;
+  R4 = 135;
+  G4 = 206;
+  B4 = 235;
+} else if(colorMode == 4){ // rain
+  R1 = 61;
+  G1 = 86;
+  B1 = 114;
+  R2 = 196;
+  G2 = 220;
+  B2 = 238;
+  R3 = 88;
+  G3 = 117;
+  B3 = 151;
+  R4 = 149;
+  G4 = 181;
+  B4 = 202;
+} else if(colorMode == 5){ // forest
+  R1 = 50;
+  G1 = 85;
+  B1 = 38;
+  R2 = 228;
+  G2 = 231;
+  B2 = 202;
+  R3 = 128;
+  G3 = 135;
+  B3 = 70;
+  R4 = 72;
+  G4 = 127;
+  B4 = 109;
+}
+
+
+////// VARIABLES
+// for golden spiral circles
 var number;
-var radius = 7;
+var radius = 4;
 var stepSize = 0.5;
-var opacity = 200;
+var opacity = 70;
+var animate = true;
 var time = 0;
-var n = 2; // multiplier for the 1200 frames
-var time = 0;
-var backR;
-var backG;
-var backB;
-var circleR;
-var circleG;
-var circleB;
-// COLOR SETS
-// ocean beach
-var beachR1 = 75; // background
-var beachG1 = 110;
-var beachB1 = 159;
-var beachR2 = 71; // circles
-var beachG2 = 157;
-var beachB2 = 184;
 
-// ocean deep
-var oceanR1 = 18; // background
-var oceanG1 = 56;
-var oceanB1 = 79;
-var oceanR2 = 52; // circles
-var oceanG2 = 99;
-var oceanB2 = 109;
+// for sticks
+var NUM_LINES = 20;
+var t = 0;
 
-// rainstorm
-var rainR1 = 49; // background
-var rainG1 = 58;
-var rainB1 = 77;
-var rainR2 = 194; // circles
-var rainG2 = 204;
-var rainB2 = 197;
+// for flow field
+var inc = 0.1
+var scl = 15;
+var columns;
+var rows;
+var zoff = 0;
+var fr;
+var particle = [];
+var particle2 = [];
+var particle3 = [];
+var flowField;
 
-// desert
-var desertR1 = 129; // background
-var desertG1 = 99;
-var desertB1 = 52;
-var desertR2 = 131; // circles
-var desertG2 = 57;
-var desertB2 = 30;
+// for mandala
+var angle;
+var gen = 80;
 
-// forest
-var forestR1 = 31; // background
-var forestG1 = 69;
-var forestB1 = 45;
-var forestR2 = 44; // circles
-var forestG2 = 92;
-var forestB2 = 72;
+//NEW SETUP integrated into old one below
+// function setup(){
+
+//   createCanvas(800, 600);
+//  // background(0);
+//   columns = floor(width / scl);
+//   rows = floor(height / scl);
+//   fr = createP('');
+  
+//   flowField = new Array(columns * rows);
+  
+//   for(var i = 0; i < 800; i++){
+//      particle[i] = new Particle();
+//      particle2[i] = new Particle();
+//      particle3[i] = new Particle();
+//   }
+  
+//   frameRate(30); // 30 fps --> 1800 fpm
+// }
+
+// var number;
+// var radius = 7;
+// var stepSize = 0.5;
+// var opacity = 200;
+// var time = 0;
+// var n = 2; // multiplier for the 1200 frames
+// var time = 0;
+// var backR;
+// var backG;
+// var backB;
+// var circleR;
+// var circleG;
+// var circleB;
+// // COLOR SETS
+// // ocean beach
+// var beachR1 = 75; // background
+// var beachG1 = 110;
+// var beachB1 = 159;
+// var beachR2 = 71; // circles
+// var beachG2 = 157;
+// var beachB2 = 184;
+
+// // ocean deep
+// var oceanR1 = 18; // background
+// var oceanG1 = 56;
+// var oceanB1 = 79;
+// var oceanR2 = 52; // circles
+// var oceanG2 = 99;
+// var oceanB2 = 109;
+
+// // rainstorm
+// var rainR1 = 49; // background
+// var rainG1 = 58;
+// var rainB1 = 77;
+// var rainR2 = 194; // circles
+// var rainG2 = 204;
+// var rainB2 = 197;
+
+// // desert
+// var desertR1 = 129; // background
+// var desertG1 = 99;
+// var desertB1 = 52;
+// var desertR2 = 131; // circles
+// var desertG2 = 57;
+// var desertB2 = 30;
+
+// // forest
+// var forestR1 = 31; // background
+// var forestG1 = 69;
+// var forestB1 = 45;
+// var forestR2 = 44; // circles
+// var forestG2 = 92;
+// var forestB2 = 72;
 
 function preload() {
   //SET UP MP3s
@@ -94,20 +231,26 @@ function preload() {
   bowls.setVolume(0);
 }
 
-var serial;
-var portName = '/dev/tty.usbmodem14101';
-var incoming;
-var data;
-var previous = 0;
-var delayInSeconds = 3;
-var delayInMillis = 3000;
-var colorMode = 3; // number between 1 - 5
-
-var active = true;
-
 function setup() {
+  //P5 VISUALIZATION
+  // createCanvas(800, 600);
   createCanvas(windowWidth, windowHeight);
+ // background(0);
+  columns = floor(width / scl);
+  rows = floor(height / scl);
+  fr = createP('');
+  
+  flowField = new Array(columns * rows);
+  
+  for(var i = 0; i < 800; i++){
+     particle[i] = new Particle();
+     particle2[i] = new Particle();
+     particle3[i] = new Particle();
+  }
+  
+  frameRate(30); // 30 fps --> 1800 fpm
 
+  //SERIAL STUFF
   serial = new p5.SerialPort(); //a new instance of serial port library
 
   //set up events for serial communication
@@ -124,43 +267,43 @@ function setup() {
   // serial.on('list', printList); //set a callback function for the serialport list event
   // serial.list(); //list the serial ports
                      
-  noStroke(); 
-  if(colorMode == 1){
-    backR = beachR1;
-    backG = beachG1;
-    backB = beachB1;
-    circleR = beachR2;
-    circleG = beachG2;
-    circleB = beachB2;
-  }else if(colorMode == 2){
-    backR = oceanR1;
-    backG = oceanG1;
-    backB = oceanB1;
-    circleR = oceanR2;
-    circleG = oceanG2;
-    circleB = oceanB2;
-  }else if(colorMode == 3){
-    backR = rainR1;
-    backG = rainG1;
-    backB = rainB1;
-    circleR = rainR2;
-    circleG = rainG2;
-    circleB = rainB2;
-  }else if(colorMode == 4){
-    backR = desertR1;
-    backG = desertG1;
-    backB = desertB1;
-    circleR = desertR2;
-    circleG = desertG2;
-    circleB = desertB2;
-  }else if(colorMode == 5){
-    backR = forestR1;
-    backG = forestG1;
-    backB = forestB1;
-    circleR = forestR2;
-    circleG = forestG2;
-    circleB = forestB2;
-  }
+  // noStroke(); 
+  // if(colorMode == 1){
+  //   backR = beachR1;
+  //   backG = beachG1;
+  //   backB = beachB1;
+  //   circleR = beachR2;
+  //   circleG = beachG2;
+  //   circleB = beachB2;
+  // }else if(colorMode == 2){
+  //   backR = oceanR1;
+  //   backG = oceanG1;
+  //   backB = oceanB1;
+  //   circleR = oceanR2;
+  //   circleG = oceanG2;
+  //   circleB = oceanB2;
+  // }else if(colorMode == 3){
+  //   backR = rainR1;
+  //   backG = rainG1;
+  //   backB = rainB1;
+  //   circleR = rainR2;
+  //   circleG = rainG2;
+  //   circleB = rainB2;
+  // }else if(colorMode == 4){
+  //   backR = desertR1;
+  //   backG = desertG1;
+  //   backB = desertB1;
+  //   circleR = desertR2;
+  //   circleG = desertG2;
+  //   circleB = desertB2;
+  // }else if(colorMode == 5){
+  //   backR = forestR1;
+  //   backG = forestG1;
+  //   backB = forestB1;
+  //   circleR = forestR2;
+  //   circleG = forestG2;
+  //   circleB = forestB2;
+  // }
 }
 
 function serverConnected(){
@@ -181,62 +324,241 @@ function serialEvent(){
   }
   
 }
+function draw(){
+  print(frameCount);
+  // minute one
+  if(frameCount < 1800){
+    background(R1, G1, B1);
+    flow();
+    flower(width/2, height/2, 1);
+    fill(R1, G1, B1, 255-frameCount);
+    rect(0, 0, width, height);
+      if(frameCount > 940){
+            newPattern();
+      }
+  }
+  // minute two
+  if(frameCount > 1800 && frameCount < 3600){
+    flow();
+    flower(width/2, height/2, 1);
+    if(frameCount > 2400){
+      flower(width/8, height/2, 0.2);
+      
+      flower(3*width/8, height/2, 0.4);
+      flower(width/2, height/2, 0.5);
+      flower(5*width/8, height/2, 0.4);
+      
+      flower(7*width/8, height/2, 0.2);
+    }
+    if(frameCount > 3000){
+      flower(width/4, height/2, 0.3);
+      flower(3*width/4, height/2, 0.3);
+      shrinkFlower();
+    }
+  }
+  // minute three
+  if(frameCount > 3600 && frameCount < 5400){
+    // background(R1, B1, G1);
 
-function draw() {
-  if(colorMode == 1){
-    backR = beachR1;
-    backG = beachG1;
-    backB = beachB1;
-    circleR = beachR2;
-    circleG = beachG2;
-    circleB = beachB2;
-  }else if(colorMode == 2){
-    backR = oceanR1;
-    backG = oceanG1;
-    backB = oceanB1;
-    circleR = oceanR2;
-    circleG = oceanG2;
-    circleB = oceanB2;
-  }else if(colorMode == 3){
-    backR = rainR1;
-    backG = rainG1;
-    backB = rainB1;
-    circleR = rainR2;
-    circleG = rainG2;
-    circleB = rainB2;
-  }else if(colorMode == 4){
-    backR = desertR1;
-    backG = desertG1;
-    backB = desertB1;
-    circleR = desertR2;
-    circleG = desertG2;
-    circleB = desertB2;
-  }else if(colorMode == 5){
-    backR = forestR1;
-    backG = forestG1;
-    backB = forestB1;
-    circleR = forestR2;
-    circleG = forestG2;
-    circleB = forestB2;
+    flower(width/2, height/2, 1);
+    flow();
+    if(frameCount > 4000){
+      flower(width/4, height/2, 0.5);
+      flower(3*width/4, height/2, 0.5);
+      if(frameCount > 4000 && frameCount < 4800){
+        newPattern();
+      }
+      
+    }
+    if(frameCount > 4800 && frameCount < 5400){
+      shrinkFlower();
+    }
+  }
+  // minute four
+  if(frameCount > 5400 && frameCount < 7120){
+   // background(R1, G1, B1); 
+     flower(width/2, height/2, 1);
+     flower(width/8, height/2, 0.4);
+     flower(width/4, height/2, 0.4);
+     flower(3*width/8, height/2, 0.5);
+     flower(width/2, height/2, 0.5);
+     flower(5*width/8, height/2, 0.5);
+     flower(3*width/4, height/2, 0.4);
+     flower(7*width/8, height/2, 0.5);
+     shrinkFlower();
+    if(frameCount > 5700){
+     flower(width/2, height/2, 1);
+     flower(width/4, height/2, 0.4);
+     flower(3*width/8, height/2, 0.5);
+     flower(width/2, height/2, 0.5);
+     flower(5*width/8, height/2, 0.5);
+     flower(3*width/4, height/2, 0.4);
+    }
+    if(frameCount > 6000){
+     flower(width/2, height/2, 1);
+     flower(3*width/8, height/2, 0.5);
+     flower(width/2, height/2, 0.5);
+     flower(5*width/8, height/2, 0.5);
+    }
+    if(frameCount > 6300){
+     flower(width/2, height/2, 1);
+     flower(width/2, height/2, 0.5);
+    }
+    if(frameCount > 6600){
+     flower(width/2, height/2, 1);
+     flower(width/2, height/2, 0.5);
+     shrinkFlower();
+    }
+  }
+  // minute five // bad transition!
+  if(frameCount > 7120 && frameCount < 9000){
+    background(R1, G1, B1);
+    flow();
+    flower(width/2, height/2, 1);
+    if(frameCount > 8100){
+      shrinkFlower();
+    }
+  }
+  if(frameCount > 8745){
+    // noLoop();
+    fill(R1, G1, B1, -8745+frameCount);
+    rect(0, 0, width, height);
+
+  }
+  if(frameCount == 9000){
+    noLoop();
   }
 
-  var smallFrames = frameCount/10;
-  background(backR, backG, backB);
-  fill(circleR, circleG, circleB,opacity);
-  translate(width / 2, height / 2); // original translation
-  number = frameCount;     
-  if(frameCount > 0){
-    newPattern(-smallFrames);
-  }
-  
   data = incoming;
   if (data != previous) 
   {
     sound();    
     // console.log("something new");
+    if(colorMode == 1){ // desert
+      R1 = 194;
+      G1 = 91;
+      B1 = 59;
+      R2 = 223;
+      G2 = 197;
+      B2 = 158;
+      R3 = 234;
+      G3 = 157;
+      B3 = 86;
+      R4 = 141;
+      G4 = 125;
+      B4 = 154;
+    } else if(colorMode == 2){ // beach
+      R1 = 117;
+      G1 = 192;
+      B1 = 220;
+      R2 = 181;
+      G2 = 226;
+      B2 = 216;
+      R3 = 150;
+      G3 = 183;
+      B3 = 172;
+      R4 = 128;
+      G4 = 202;
+      B4 = 196;
+    } else if(colorMode == 3){ // ocean
+      R1 = 18;
+      G1 = 55;
+      B1 = 80;
+      R2 = 189;
+      G2 = 203;
+      B2 = 212;
+      R3 = 76;
+      G3 = 132;
+      B3 = 165;
+      R4 = 135;
+      G4 = 206;
+      B4 = 235;
+    } else if(colorMode == 4){ // rain
+      R1 = 61;
+      G1 = 86;
+      B1 = 114;
+      R2 = 196;
+      G2 = 220;
+      B2 = 238;
+      R3 = 88;
+      G3 = 117;
+      B3 = 151;
+      R4 = 149;
+      G4 = 181;
+      B4 = 202;
+    } else if(colorMode == 5){ // forest
+      R1 = 50;
+      G1 = 85;
+      B1 = 38;
+      R2 = 228;
+      G2 = 231;
+      B2 = 202;
+      R3 = 128;
+      G3 = 135;
+      B3 = 70;
+      R4 = 72;
+      G4 = 127;
+      B4 = 109;
+    }
   }
   previous = data;
 }
+
+// function draw() {
+//   if(colorMode == 1){
+//     backR = beachR1;
+//     backG = beachG1;
+//     backB = beachB1;
+//     circleR = beachR2;
+//     circleG = beachG2;
+//     circleB = beachB2;
+//   }else if(colorMode == 2){
+//     backR = oceanR1;
+//     backG = oceanG1;
+//     backB = oceanB1;
+//     circleR = oceanR2;
+//     circleG = oceanG2;
+//     circleB = oceanB2;
+//   }else if(colorMode == 3){
+//     backR = rainR1;
+//     backG = rainG1;
+//     backB = rainB1;
+//     circleR = rainR2;
+//     circleG = rainG2;
+//     circleB = rainB2;
+//   }else if(colorMode == 4){
+//     backR = desertR1;
+//     backG = desertG1;
+//     backB = desertB1;
+//     circleR = desertR2;
+//     circleG = desertG2;
+//     circleB = desertB2;
+//   }else if(colorMode == 5){
+//     backR = forestR1;
+//     backG = forestG1;
+//     backB = forestB1;
+//     circleR = forestR2;
+//     circleG = forestG2;
+//     circleB = forestB2;
+//   }
+
+//   var smallFrames = frameCount/10;
+//   background(backR, backG, backB);
+//   fill(circleR, circleG, circleB,opacity);
+//   translate(width / 2, height / 2); // original translation
+//   number = frameCount;     
+//   if(frameCount > 0){
+//     newPattern(-smallFrames);
+//   }
+  
+//   data = incoming;
+//   if (data != previous) 
+//   {
+//     sound();    
+//     // console.log("something new");
+//   }
+//   previous = data;
+// }
 
 function sound(){
   bowls.play();
@@ -267,12 +589,14 @@ function sound(){
     beach.setVolume(0);
     beach.play();
     beach.setVolume(1, delayInSeconds);
-    colorMode = 1;
+    // colorMode = 1;
+    colorMode = 2;
   } else if(incoming == "B"){ //DESERT
     desert.setVolume(0);
     desert.play();
     desert.setVolume(1, delayInSeconds);
-    colorMode = 4;
+    // colorMode = 4;
+    colorMode = 1;
   } else if(incoming == "C"){ //FOREST
     forest.setVolume(0);
     forest.play();
@@ -282,12 +606,14 @@ function sound(){
     thunderstorm.setVolume(0);
     thunderstorm.play();
     thunderstorm.setVolume(1, delayInSeconds);
-    colorMode = 3;
+    // colorMode = 3;
+    colorMode = 4;
   } else if(incoming == "E"){ //UNDERWATER
     underwater.setVolume(0);
     underwater.play();
     underwater.setVolume(1, delayInSeconds);
-    colorMode = 2;
+    // colorMode = 2;
+    colorMode = 3;
   } else if(incoming == "0"){
     // background(0,0,0);
     bowls.setVolume(0, delayInSeconds);
@@ -313,16 +639,206 @@ function printList(portList) {
  }
 }
 
-function newPattern(moveX){
+//OLD CODE
+// function newPattern(moveX){
+//   var goldenAngle = PI * (3.0 - sqrt(5));
+//   rotate(time);
+
+//   for (var i = 0; i < number; i++) {
+    
+//     translate(moveX, i * stepSize);
+//     rotate(goldenAngle);
+//     // draw ellipse
+//     ellipse(0, 0, radius);
+//   }
+//   time += 0.005;
+// }
+
+
+///////// HELPER METHODS
+// flowfield
+function flow(){
+  var yoff = 0;
+
+  for(var y = 0; y < rows; y++){
+    var xoff = 0;
+    for(var x = 0; x < columns; x++){
+      var index = x + y * columns;
+      
+      var angle = noise(xoff, yoff, zoff)*TWO_PI*2;
+      
+      var v = p5.Vector.fromAngle(angle);
+      v.setMag(1);
+      flowField[index] = v;
+      xoff += inc;
+    
+    }
+    yoff += inc;
+    zoff += 0.0003;
+  }
+  
+  for(var i = 0; i < particle.length; i++){
+    particle[i].follow(flowField);
+    particle[i].update();
+    particle[i].show();
+    particle[i].edges();
+  }
+
+  fr.html(floor(frameRate()));
+    // print(frameCount);
+  if(frameCount > 1000){
+      for(var j = 0; j < particle2.length; j++){
+        particle2[j].follow(flowField);
+        particle2[j].update();
+        particle2[j].show();
+        particle2[j].edges();
+      }
+  }
+  if(frameCount > 3600){
+      for(var k = 0; k < particle3.length; k++){
+        particle3[k].follow(flowField);
+        particle3[k].update();
+        particle3[k].show();
+        particle3[k].edges();
+      }
+  }
+}
+
+
+// growing & shrinking mandala
+function flower(originX, originY, newSize){
+    strokeWeight(0.8);
+
+    stroke(R2, G2, B2, 80);
+    fill(R3, G3, B3, 10);
+    if(frameCount > 3600){
+      fill(R1, G1, B1, 2);
+    }
+    if(frameCount > 5000){ // bad fill??
+      fill(R1, G1, B1, 2);
+    }
+  if(frameCount > 6300){
+      fill(R4, G4, B4, 2);
+    }
+  
+    angle = sin(gen*44)*44;
+      push();
+        translate(originX, originY);
+        scale(newSize);
+        rotate(gen*2);
+        for(var i = 0; i < 144; i++){
+          rotate(6 / gen*44);
+          curve(i, i, 0, angle+i, 133, angle-i, i+133, i);
+        }
+      pop();
+
+      gen += 0.00009;
+}
+
+function shrinkFlower(originX, originY){
+    stroke(R1, G1, B1, 80);
+    strokeWeight(0.8);
+    fill(R3, G3, B3, 5);
+  
+    angle = sin(gen*44)*44;
+   // background(angle*100, 100, 100);
+      // scale(newSize);
+      push();
+       // translate(originX, originY);
+        // scale(newSize);
+        rotate(gen*2);
+        for(var i = 0; i < 144; i++){
+          scale(10/(i+1));
+          rotate(6 / gen*44);
+          curve(i, i, 0, angle+i, 133, angle-i, i+133, i);
+        }
+      pop();
+
+      gen += 0.00009;
+}
+
+// golden spiral spinning circles
+function newPattern(){
+  fill(R2, G2, B2,opacity);
+  if(frameCount > 4000){
+    fill(R3, G3, B3, opacity/2);
+  }
+  noStroke();
+  translate(width / 2, height / 2); // original translation
+  if (animate == true){
+    number = frameCount - 940;     
+  }
   var goldenAngle = PI * (3.0 - sqrt(5));
   rotate(time);
-
+  
   for (var i = 0; i < number; i++) {
-    
-    translate(moveX, i * stepSize);
+  //  translate(-frameCount/10, i * stepSize);
+    translate(0, i * stepSize/2);
     rotate(goldenAngle);
     // draw ellipse
     ellipse(0, 0, radius);
   }
   time += 0.005;
+}
+
+function Particle(){
+  this.pos = createVector(random(width), random(height));
+  this.vel = createVector(0,0);
+  this.acc = createVector(0,0);
+  this.maxspeed = 3;
+  
+  this.prevPos = this.pos.copy();
+  
+  this.update = function(){
+    this.vel.add(this.acc);
+    this.vel.limit(this.maxspeed);
+    this.pos.add(this.vel);
+    this.acc.mult(0);
+    
+  }
+  
+  this.follow = function(vectors){
+    var x = floor(this.pos.x / scl);
+    var y = floor(this.pos.y / scl);
+    var index = x + y * columns;
+    var force = vectors[index];
+    this.applyForce(force);
+  }
+  
+  this.applyForce = function(force){
+    this.acc.add(force);
+  }
+  
+  this.show = function(){
+   stroke(255, 255, 255, 5);
+    strokeWeight(1.5);
+    //fill(58, 139, 159, 10)
+    line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
+   // point(this.pos.x, this.pos.y);
+    this.updatePrev();
+  }
+  
+  this.updatePrev = function(){
+      this.prevPos.x = this.pos.x;
+      this.prevPos.y = this.pos.y;
+  }
+  
+  this.edges = function(){
+    if(this.pos.x > width){
+      this.pos.x = 0;
+      this.updatePrev();
+    }
+    if(this.pos.x < 0){
+      this.pos.x = width;
+      this.updatePrev();
+    }
+    if(this.pos.y > height){
+      this.pos.y = 0;
+      this.updatePrev();
+    }
+    if(this.pos.x < 0){
+      this.pos.y = height;
+      this.updatePrev();
+    }
+  }
 }
