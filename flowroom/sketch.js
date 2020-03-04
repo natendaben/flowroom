@@ -88,6 +88,10 @@ function preload() {
   underwater.playMode('restart');
   underwater.setVolume(0);
   underwater.setLoop(true);
+  bowls = loadSound('assets/bowls.mp3');
+  bowls.playMode('untilDone');
+  bowls.setLoop(true);
+  bowls.setVolume(0);
 }
 
 var serial;
@@ -98,6 +102,8 @@ var previous = 0;
 var delayInSeconds = 3;
 var delayInMillis = 3000;
 var colorMode = 3; // number between 1 - 5
+
+var active = true;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -233,6 +239,9 @@ function draw() {
 }
 
 function sound(){
+  bowls.play();
+  bowls.setVolume(1, delayInSeconds);
+  console.log("Bowls playing");
   if(previous == "A"){
     beach.setVolume(0, delayInSeconds);
     console.log("Fading beach down");
@@ -281,6 +290,9 @@ function sound(){
     colorMode = 2;
   } else if(incoming == "0"){
     // background(0,0,0);
+    bowls.setVolume(0, delayInSeconds);
+    console.log("Fading bowls down");
+    window.setTimeout(()=>{bowls.stop(); console.log("bowls off");}, delayInMillis);
   }
 }
 
