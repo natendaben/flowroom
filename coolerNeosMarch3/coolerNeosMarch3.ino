@@ -29,8 +29,8 @@ CRGB room_strip_leds[ROOM_STRIP_NUM_LEDS]; //array for both room strips
 #define VOLTS           5
 #define MAX_MA      20000
 CRGBArray<NUM_LEDS> leds;
-#define TWINKLE_SPEED 4
-#define TWINKLE_DENSITY 6
+int twinkle_speed = 4;
+int twinkle_density = 6;
 #define SECONDS_PER_PALETTE  30
 CRGB gBackgroundColor = CRGB::Black;
 #define AUTO_SELECT_BACKGROUND_COLOR 1
@@ -43,15 +43,15 @@ CRGBPalette16 targetFxPalette;
 CRGB control_panel_leds[CONTROL_PANEL_NUM_LEDS];
 
 // ~~~~~~~~~~~~~~~~~~~~~~ DEFINE COLORS ~~~~~~~~~~~~~~~~~~~~~~
-
+#define seaBlue 0x00faf6
 //  Beach - Light blues / tans / waves
-CRGB beach = CHSV(130,255,255);
+CRGB beach = seaBlue;
 //  Desert - Light brown / fire effect
 CRGB desert = CHSV(40,255,255);
 //  Forest - Deep greens / blue / stream
 CRGB forest = CHSV(105,255,255);
 //  Thunderstorm - Dark blue / white lightning flashes
-CRGB storm = CHSV(180,255,255);
+CRGB storm = CRGB::MidnightBlue;
 //  Underwater - Deep blues  / light grey bubbles
 CRGB water = CHSV(170,255,255);
 
@@ -92,11 +92,12 @@ const TProgmemRGBPalette16 Forest_p FL_PROGMEM =
 
 //BEACH PALETTE
 // A mostly tan palette with blue accents.
+#define seaBlue 0x00faf6
 const TProgmemRGBPalette16 Beach_p FL_PROGMEM =
 {  CRGB::Gold,CRGB::Gold,CRGB::Gold,CRGB::Gold,
    CRGB::Gold,CRGB::Gold,CRGB::Gold,CRGB::Gold,
-   CRGB::Yellow, CRGB::Yellow, CRGB::SkyBlue, CRGB::SkyBlue, 
-   CRGB::Blue, CRGB::Blue, CRGB::Blue, CRGB::Blue };
+   CRGB::Yellow, CRGB::Yellow, seaBlue, seaBlue, 
+   seaBlue, seaBlue, CRGB::Blue, CRGB::Blue };
 
 //STORM PALETTE
 // A mostly blue palette with white accents.
@@ -179,26 +180,36 @@ void loop() {
            targetColor = storm;
            Serial.println("D");
            targetFxPalette = Storm_p;
+           twinkle_speed = 6;
+           twinkle_density = 1;
         }
         if (mfrc522.uid.uidByte[0] == 0xC9 && mfrc522.uid.uidByte[1] == 0xFA && mfrc522.uid.uidByte[2] == 0x21 && mfrc522.uid.uidByte[3] == 0xB3) {
            targetColor = water;
            Serial.println("E");
            targetFxPalette = Ocean_p;
+           twinkle_speed = 4;
+           twinkle_density = 6;
         }
         if (mfrc522.uid.uidByte[0] == 0xF9 && mfrc522.uid.uidByte[1] == 0xEC && mfrc522.uid.uidByte[2] == 0xC4 && mfrc522.uid.uidByte[3] == 0xB1) {
            targetColor = forest;
            Serial.println("C");
            targetFxPalette = Forest_p;
+           twinkle_speed = 4;
+           twinkle_density = 5;
         }
         if (mfrc522.uid.uidByte[0] == 0xC9 && mfrc522.uid.uidByte[1] == 0xB1 && mfrc522.uid.uidByte[2] == 0xB6 && mfrc522.uid.uidByte[3] == 0xB0) {
            targetColor = desert;
            Serial.println("B");
            targetFxPalette = Desert_p;
+           twinkle_speed = 5;
+           twinkle_density = 1;
         }
         if (mfrc522.uid.uidByte[0] == 0x29 && mfrc522.uid.uidByte[1] == 0x8E && mfrc522.uid.uidByte[2] == 0xAD && mfrc522.uid.uidByte[3] == 0xB0) {
            targetColor = beach;
            Serial.println("A");
            targetFxPalette = Beach_p;
+           twinkle_speed = 3;
+           twinkle_density = 7;
         }
 //        Serial.print("Tag UID:");
 //        for (byte i = 0; i < mfrc522.uid.size; i++) {
@@ -324,7 +335,7 @@ void drawTwinkles( CRGBSet& L)
 
 CRGB computeOneTwinkle( uint32_t ms, uint8_t salt)
 {
-  uint16_t ticks = ms >> (8-TWINKLE_SPEED);
+  uint16_t ticks = ms >> (8-twinkle_speed);
   uint8_t fastcycle8 = ticks;
   uint16_t slowcycle16 = (ticks >> 8) + salt;
   slowcycle16 += sin8( slowcycle16);
@@ -332,7 +343,7 @@ CRGB computeOneTwinkle( uint32_t ms, uint8_t salt)
   uint8_t slowcycle8 = (slowcycle16 & 0xFF) + (slowcycle16 >> 8);
   
   uint8_t bright = 0;
-  if( ((slowcycle8 & 0x0E)/2) < TWINKLE_DENSITY) {
+  if( ((slowcycle8 & 0x0E)/2) < twinkle_density) {
     bright = attackDecayWave8( fastcycle8);
   }
 
