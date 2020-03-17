@@ -473,7 +473,7 @@ function sound(){
   } 
   if (visualizationOn){
     bowls.play();
-    bowls.setVolume(.7, delayInSeconds);
+    bowls.setVolume(.5, delayInSeconds);
     console.log("Bowls playing");
   } else {
     bowls.setVolume(0, delayInSeconds);
