@@ -22,7 +22,7 @@ var previous = 0;
 var delayInSeconds = 3;
 var delayInMillis = 3000;
 var colorMode = 3; // number between 1 - 5
-
+var visualizationOn = false;
 var active = true;
 
 ////// COLOR STUFF
@@ -129,80 +129,6 @@ var flowField;
 var angle;
 var gen = 80;
 
-//NEW SETUP integrated into old one below
-// function setup(){
-
-//   createCanvas(800, 600);
-//  // background(0);
-//   columns = floor(width / scl);
-//   rows = floor(height / scl);
-//   fr = createP('');
-  
-//   flowField = new Array(columns * rows);
-  
-//   for(var i = 0; i < 800; i++){
-//      particle[i] = new Particle();
-//      particle2[i] = new Particle();
-//      particle3[i] = new Particle();
-//   }
-  
-//   frameRate(30); // 30 fps --> 1800 fpm
-// }
-
-// var number;
-// var radius = 7;
-// var stepSize = 0.5;
-// var opacity = 200;
-// var time = 0;
-// var n = 2; // multiplier for the 1200 frames
-// var time = 0;
-// var backR;
-// var backG;
-// var backB;
-// var circleR;
-// var circleG;
-// var circleB;
-// // COLOR SETS
-// // ocean beach
-// var beachR1 = 75; // background
-// var beachG1 = 110;
-// var beachB1 = 159;
-// var beachR2 = 71; // circles
-// var beachG2 = 157;
-// var beachB2 = 184;
-
-// // ocean deep
-// var oceanR1 = 18; // background
-// var oceanG1 = 56;
-// var oceanB1 = 79;
-// var oceanR2 = 52; // circles
-// var oceanG2 = 99;
-// var oceanB2 = 109;
-
-// // rainstorm
-// var rainR1 = 49; // background
-// var rainG1 = 58;
-// var rainB1 = 77;
-// var rainR2 = 194; // circles
-// var rainG2 = 204;
-// var rainB2 = 197;
-
-// // desert
-// var desertR1 = 129; // background
-// var desertG1 = 99;
-// var desertB1 = 52;
-// var desertR2 = 131; // circles
-// var desertG2 = 57;
-// var desertB2 = 30;
-
-// // forest
-// var forestR1 = 31; // background
-// var forestG1 = 69;
-// var forestB1 = 45;
-// var forestR2 = 44; // circles
-// var forestG2 = 92;
-// var forestB2 = 72;
-
 function preload() {
   //SET UP MP3s
   beach = loadSound('assets/beach.mp3');
@@ -266,44 +192,7 @@ function setup() {
   //let's figure out what port we're on - useful for determining your port
   // serial.on('list', printList); //set a callback function for the serialport list event
   // serial.list(); //list the serial ports
-                     
-  // noStroke(); 
-  // if(colorMode == 1){
-  //   backR = beachR1;
-  //   backG = beachG1;
-  //   backB = beachB1;
-  //   circleR = beachR2;
-  //   circleG = beachG2;
-  //   circleB = beachB2;
-  // }else if(colorMode == 2){
-  //   backR = oceanR1;
-  //   backG = oceanG1;
-  //   backB = oceanB1;
-  //   circleR = oceanR2;
-  //   circleG = oceanG2;
-  //   circleB = oceanB2;
-  // }else if(colorMode == 3){
-  //   backR = rainR1;
-  //   backG = rainG1;
-  //   backB = rainB1;
-  //   circleR = rainR2;
-  //   circleG = rainG2;
-  //   circleB = rainB2;
-  // }else if(colorMode == 4){
-  //   backR = desertR1;
-  //   backG = desertG1;
-  //   backB = desertB1;
-  //   circleR = desertR2;
-  //   circleG = desertG2;
-  //   circleB = desertB2;
-  // }else if(colorMode == 5){
-  //   backR = forestR1;
-  //   backG = forestG1;
-  //   backB = forestB1;
-  //   circleR = forestR2;
-  //   circleG = forestG2;
-  //   circleB = forestB2;
-  // }
+  
 }
 
 function serverConnected(){
@@ -325,7 +214,7 @@ function serialEvent(){
   
 }
 function draw(){
-  print(frameCount);
+  //print(frameCount);
   // minute one
   if(frameCount < 1800){
     background(R1, G1, B1);
@@ -432,138 +321,96 @@ function draw(){
   data = incoming;
   if (data != previous) 
   {
-    sound();    
+    sound();  
     // console.log("something new");
-    if(colorMode == 1){ // desert
-      R1 = 194;
-      G1 = 91;
-      B1 = 59;
-      R2 = 223;
-      G2 = 197;
-      B2 = 158;
-      R3 = 234;
-      G3 = 157;
-      B3 = 86;
-      R4 = 141;
-      G4 = 125;
-      B4 = 154;
-    } else if(colorMode == 2){ // beach
-      R1 = 117;
-      G1 = 192;
-      B1 = 220;
-      R2 = 181;
-      G2 = 226;
-      B2 = 216;
-      R3 = 150;
-      G3 = 183;
-      B3 = 172;
-      R4 = 128;
-      G4 = 202;
-      B4 = 196;
-    } else if(colorMode == 3){ // ocean
-      R1 = 18;
-      G1 = 55;
-      B1 = 80;
-      R2 = 189;
-      G2 = 203;
-      B2 = 212;
-      R3 = 76;
-      G3 = 132;
-      B3 = 165;
-      R4 = 135;
-      G4 = 206;
-      B4 = 235;
-    } else if(colorMode == 4){ // rain
-      R1 = 61;
-      G1 = 86;
-      B1 = 114;
-      R2 = 196;
-      G2 = 220;
-      B2 = 238;
-      R3 = 88;
-      G3 = 117;
-      B3 = 151;
-      R4 = 149;
-      G4 = 181;
-      B4 = 202;
-    } else if(colorMode == 5){ // forest
-      R1 = 50;
-      G1 = 85;
-      B1 = 38;
-      R2 = 228;
-      G2 = 231;
-      B2 = 202;
-      R3 = 128;
-      G3 = 135;
-      B3 = 70;
-      R4 = 72;
-      G4 = 127;
-      B4 = 109;
+    if(visualizationOn){
+      if(colorMode == 1){ // desert
+        R1 = 194;
+        G1 = 91;
+        B1 = 59;
+        R2 = 223;
+        G2 = 197;
+        B2 = 158;
+        R3 = 234;
+        G3 = 157;
+        B3 = 86;
+        R4 = 141;
+        G4 = 125;
+        B4 = 154;
+      } else if(colorMode == 2){ // beach
+        R1 = 117;
+        G1 = 192;
+        B1 = 220;
+        R2 = 181;
+        G2 = 226;
+        B2 = 216;
+        R3 = 150;
+        G3 = 183;
+        B3 = 172;
+        R4 = 128;
+        G4 = 202;
+        B4 = 196;
+      } else if(colorMode == 3){ // ocean
+        R1 = 18;
+        G1 = 55;
+        B1 = 80;
+        R2 = 189;
+        G2 = 203;
+        B2 = 212;
+        R3 = 76;
+        G3 = 132;
+        B3 = 165;
+        R4 = 135;
+        G4 = 206;
+        B4 = 235;
+      } else if(colorMode == 4){ // rain
+        R1 = 61;
+        G1 = 86;
+        B1 = 114;
+        R2 = 196;
+        G2 = 220;
+        B2 = 238;
+        R3 = 88;
+        G3 = 117;
+        B3 = 151;
+        R4 = 149;
+        G4 = 181;
+        B4 = 202;
+      } else if(colorMode == 5){ // forest
+        R1 = 50;
+        G1 = 85;
+        B1 = 38;
+        R2 = 228;
+        G2 = 231;
+        B2 = 202;
+        R3 = 128;
+        G3 = 135;
+        B3 = 70;
+        R4 = 72;
+        G4 = 127;
+        B4 = 109;
+      }
+    } else { //visualization off
+      // R1 = 0;
+      // G1 = 0;
+      // B1 = 0;
+      // R2 = 0;
+      // G2 = 0;
+      // B2 = 0;
+      // R3 = 0;
+      // G3 = 0;
+      // B3 = 0;
+      // R4 = 0;
+      // G4 = 0;
+      // B4 = 0;
     }
   }
   previous = data;
 }
 
-// function draw() {
-//   if(colorMode == 1){
-//     backR = beachR1;
-//     backG = beachG1;
-//     backB = beachB1;
-//     circleR = beachR2;
-//     circleG = beachG2;
-//     circleB = beachB2;
-//   }else if(colorMode == 2){
-//     backR = oceanR1;
-//     backG = oceanG1;
-//     backB = oceanB1;
-//     circleR = oceanR2;
-//     circleG = oceanG2;
-//     circleB = oceanB2;
-//   }else if(colorMode == 3){
-//     backR = rainR1;
-//     backG = rainG1;
-//     backB = rainB1;
-//     circleR = rainR2;
-//     circleG = rainG2;
-//     circleB = rainB2;
-//   }else if(colorMode == 4){
-//     backR = desertR1;
-//     backG = desertG1;
-//     backB = desertB1;
-//     circleR = desertR2;
-//     circleG = desertG2;
-//     circleB = desertB2;
-//   }else if(colorMode == 5){
-//     backR = forestR1;
-//     backG = forestG1;
-//     backB = forestB1;
-//     circleR = forestR2;
-//     circleG = forestG2;
-//     circleB = forestB2;
-//   }
-
-//   var smallFrames = frameCount/10;
-//   background(backR, backG, backB);
-//   fill(circleR, circleG, circleB,opacity);
-//   translate(width / 2, height / 2); // original translation
-//   number = frameCount;     
-//   if(frameCount > 0){
-//     newPattern(-smallFrames);
-//   }
-  
-//   data = incoming;
-//   if (data != previous) 
-//   {
-//     sound();    
-//     // console.log("something new");
-//   }
-//   previous = data;
-// }
 
 function sound(){
-  bowls.play();
-  bowls.setVolume(1, delayInSeconds);
-  console.log("Bowls playing");
+
   if(previous == "A"){
     beach.setVolume(0, delayInSeconds);
     console.log("Fading beach down");
@@ -588,34 +435,47 @@ function sound(){
   if(incoming == "A"){ //BEACH
     beach.setVolume(0);
     beach.play();
-    beach.setVolume(1, delayInSeconds);
+    beach.setVolume(.8, delayInSeconds);
+    visualizationOn = true;
     // colorMode = 1;
     colorMode = 2;
   } else if(incoming == "B"){ //DESERT
     desert.setVolume(0);
     desert.play();
-    desert.setVolume(1, delayInSeconds);
+    desert.setVolume(.8, delayInSeconds);
+    visualizationOn = true;
     // colorMode = 4;
     colorMode = 1;
   } else if(incoming == "C"){ //FOREST
     forest.setVolume(0);
     forest.play();
-    forest.setVolume(1, delayInSeconds);
+    forest.setVolume(.8, delayInSeconds);
+    visualizationOn = true;
     colorMode = 5;
   } else if(incoming == "D"){ //THUNDERSTORM
     thunderstorm.setVolume(0);
     thunderstorm.play();
-    thunderstorm.setVolume(1, delayInSeconds);
+    thunderstorm.setVolume(.9, delayInSeconds);
+    visualizationOn = true;
     // colorMode = 3;
     colorMode = 4;
   } else if(incoming == "E"){ //UNDERWATER
     underwater.setVolume(0);
     underwater.play();
     underwater.setVolume(1, delayInSeconds);
+    visualizationOn = true;
     // colorMode = 2;
     colorMode = 3;
   } else if(incoming == "0"){
     // background(0,0,0);
+    visualizationOn = false;
+    console.log("Turn down signal received");
+  } 
+  if (visualizationOn){
+    bowls.play();
+    bowls.setVolume(.7, delayInSeconds);
+    console.log("Bowls playing");
+  } else {
     bowls.setVolume(0, delayInSeconds);
     console.log("Fading bowls down");
     window.setTimeout(()=>{bowls.stop(); console.log("bowls off");}, delayInMillis);
@@ -638,21 +498,6 @@ function printList(portList) {
  print(i + " " + portList[i]);
  }
 }
-
-//OLD CODE
-// function newPattern(moveX){
-//   var goldenAngle = PI * (3.0 - sqrt(5));
-//   rotate(time);
-
-//   for (var i = 0; i < number; i++) {
-    
-//     translate(moveX, i * stepSize);
-//     rotate(goldenAngle);
-//     // draw ellipse
-//     ellipse(0, 0, radius);
-//   }
-//   time += 0.005;
-// }
 
 
 ///////// HELPER METHODS
