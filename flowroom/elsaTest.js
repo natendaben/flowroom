@@ -101,6 +101,7 @@ if(colorMode == 1){ // desert
 
 
 ////// VARIABLES
+
 // for golden spiral circles
 var number;
 var radius = 4;
@@ -162,17 +163,18 @@ function setup() {
   // createCanvas(800, 600);
   createCanvas(windowWidth, windowHeight);
  // background(0);
-  columns = floor(width / scl);
-  rows = floor(height / scl);
-  fr = createP('');
+  // columns = floor(width / scl);
+  // rows = floor(height / scl);
+  // fr = createP('');
+  lap = 0;
+  resetSketch();
+  // flowField = new Array(columns * rows);
   
-  flowField = new Array(columns * rows);
-  
-  for(var i = 0; i < 800; i++){
-     particle[i] = new Particle();
-     particle2[i] = new Particle();
-     particle3[i] = new Particle();
-  }
+  // for(var i = 0; i < 800; i++){
+  //    particle[i] = new Particle();
+  //    particle2[i] = new Particle();
+  //    particle3[i] = new Particle();
+  // }
   
   frameRate(30); // 30 fps --> 1800 fpm
 
@@ -211,106 +213,18 @@ function serialEvent(){
     console.log(inString);
     incoming = inString;
   }
-  data = incoming;
-  if (data != previous) 
-  {
-    sound();  
-    // console.log("something new");
-    if(visualizationOn){
-      if(colorMode == 1){ // desert
-        R1 = 194;
-        G1 = 91;
-        B1 = 59;
-        R2 = 223;
-        G2 = 197;
-        B2 = 158;
-        R3 = 234;
-        G3 = 157;
-        B3 = 86;
-        R4 = 141;
-        G4 = 125;
-        B4 = 154;
-      } else if(colorMode == 2){ // beach
-        R1 = 117;
-        G1 = 192;
-        B1 = 220;
-        R2 = 181;
-        G2 = 226;
-        B2 = 216;
-        R3 = 150;
-        G3 = 183;
-        B3 = 172;
-        R4 = 128;
-        G4 = 202;
-        B4 = 196;
-      } else if(colorMode == 3){ // ocean
-        R1 = 18;
-        G1 = 55;
-        B1 = 80;
-        R2 = 189;
-        G2 = 203;
-        B2 = 212;
-        R3 = 76;
-        G3 = 132;
-        B3 = 165;
-        R4 = 135;
-        G4 = 206;
-        B4 = 235;
-      } else if(colorMode == 4){ // rain
-        R1 = 61;
-        G1 = 86;
-        B1 = 114;
-        R2 = 196;
-        G2 = 220;
-        B2 = 238;
-        R3 = 88;
-        G3 = 117;
-        B3 = 151;
-        R4 = 149;
-        G4 = 181;
-        B4 = 202;
-      } else if(colorMode == 5){ // forest
-        R1 = 50;
-        G1 = 85;
-        B1 = 38;
-        R2 = 228;
-        G2 = 231;
-        B2 = 202;
-        R3 = 128;
-        G3 = 135;
-        B3 = 70;
-        R4 = 72;
-        G4 = 127;
-        B4 = 109;
-      }
-    } else { //visualization off
-      // R1 = 0;
-      // G1 = 0;
-      // B1 = 0;
-      // R2 = 0;
-      // G2 = 0;
-      // B2 = 0;
-      // R3 = 0;
-      // G3 = 0;
-      // B3 = 0;
-      // R4 = 0;
-      // G4 = 0;
-      // B4 = 0;
-    }
-  }
-  previous = data;
   
 }
 function draw(){
-  print(time);
+  //print(frameCount);
   // minute one
   if(time < 1800){
     background(R1, G1, B1);
     flow();
     flower(width/2, height/2, 1);
-    fill(R1, G1, B1, 255-time);
+    fill(R1, G1, B1, 255-frameCount);
     rect(0, 0, width, height);
-      if(time > 940){
+      if(frameCount > 940){
             newPattern();
       }
   }
@@ -405,97 +319,99 @@ function draw(){
   if(time > 9000){
     time = 0;
    }
- 
  time += 1;
-
-  // data = incoming;
-  // if (data != previous) 
-  // {
-  //   sound();  
-  //   // console.log("something new");
-  //   if(visualizationOn){
-  //     if(colorMode == 1){ // desert
-  //       R1 = 194;
-  //       G1 = 91;
-  //       B1 = 59;
-  //       R2 = 223;
-  //       G2 = 197;
-  //       B2 = 158;
-  //       R3 = 234;
-  //       G3 = 157;
-  //       B3 = 86;
-  //       R4 = 141;
-  //       G4 = 125;
-  //       B4 = 154;
-  //     } else if(colorMode == 2){ // beach
-  //       R1 = 117;
-  //       G1 = 192;
-  //       B1 = 220;
-  //       R2 = 181;
-  //       G2 = 226;
-  //       B2 = 216;
-  //       R3 = 150;
-  //       G3 = 183;
-  //       B3 = 172;
-  //       R4 = 128;
-  //       G4 = 202;
-  //       B4 = 196;
-  //     } else if(colorMode == 3){ // ocean
-  //       R1 = 18;
-  //       G1 = 55;
-  //       B1 = 80;
-  //       R2 = 189;
-  //       G2 = 203;
-  //       B2 = 212;
-  //       R3 = 76;
-  //       G3 = 132;
-  //       B3 = 165;
-  //       R4 = 135;
-  //       G4 = 206;
-  //       B4 = 235;
-  //     } else if(colorMode == 4){ // rain
-  //       R1 = 61;
-  //       G1 = 86;
-  //       B1 = 114;
-  //       R2 = 196;
-  //       G2 = 220;
-  //       B2 = 238;
-  //       R3 = 88;
-  //       G3 = 117;
-  //       B3 = 151;
-  //       R4 = 149;
-  //       G4 = 181;
-  //       B4 = 202;
-  //     } else if(colorMode == 5){ // forest
-  //       R1 = 50;
-  //       G1 = 85;
-  //       B1 = 38;
-  //       R2 = 228;
-  //       G2 = 231;
-  //       B2 = 202;
-  //       R3 = 128;
-  //       G3 = 135;
-  //       B3 = 70;
-  //       R4 = 72;
-  //       G4 = 127;
-  //       B4 = 109;
-  //     }
-  //   } else { //visualization off
-  //     // R1 = 0;
-  //     // G1 = 0;
-  //     // B1 = 0;
-  //     // R2 = 0;
-  //     // G2 = 0;
-  //     // B2 = 0;
-  //     // R3 = 0;
-  //     // G3 = 0;
-  //     // B3 = 0;
-  //     // R4 = 0;
-  //     // G4 = 0;
-  //     // B4 = 0;
-  //   }
+  // if(time == 9000){
+  //   noLoop();
   // }
-  // previous = data;
+
+  data = incoming;
+  if (data != previous) 
+  {
+    sound();  
+    // console.log("something new");
+    if(visualizationOn){
+      if(colorMode == 1){ // desert
+        R1 = 194;
+        G1 = 91;
+        B1 = 59;
+        R2 = 223;
+        G2 = 197;
+        B2 = 158;
+        R3 = 234;
+        G3 = 157;
+        B3 = 86;
+        R4 = 141;
+        G4 = 125;
+        B4 = 154;
+        resetSketch();
+        loop();
+      } else if(colorMode == 2){ // beach
+        R1 = 117;
+        G1 = 192;
+        B1 = 220;
+        R2 = 181;
+        G2 = 226;
+        B2 = 216;
+        R3 = 150;
+        G3 = 183;
+        B3 = 172;
+        R4 = 128;
+        G4 = 202;
+        B4 = 196;
+        resetSketch();
+        loop();
+      } else if(colorMode == 3){ // ocean
+        R1 = 18;
+        G1 = 55;
+        B1 = 80;
+        R2 = 189;
+        G2 = 203;
+        B2 = 212;
+        R3 = 76;
+        G3 = 132;
+        B3 = 165;
+        R4 = 135;
+        G4 = 206;
+        B4 = 235;
+        resetSketch();
+        loop();
+      } else if(colorMode == 4){ // rain
+        R1 = 61;
+        G1 = 86;
+        B1 = 114;
+        R2 = 196;
+        G2 = 220;
+        B2 = 238;
+        R3 = 88;
+        G3 = 117;
+        B3 = 151;
+        R4 = 149;
+        G4 = 181;
+        B4 = 202;
+        resetSketch();
+        loop();
+      } else if(colorMode == 5){ // forest
+        R1 = 50;
+        G1 = 85;
+        B1 = 38;
+        R2 = 228;
+        G2 = 231;
+        B2 = 202;
+        R3 = 128;
+        G3 = 135;
+        B3 = 70;
+        R4 = 72;
+        G4 = 127;
+        B4 = 109;
+        resetSketch();
+        loop();
+      }
+    } else { //visualization off
+      noLoop();
+      time = 0;
+    }
+  }
+  previous = data;
 }
 
 
@@ -529,7 +445,6 @@ function sound(){
     visualizationOn = true;
     // colorMode = 1;
     colorMode = 2;
-    loop();
   } else if(incoming == "B"){ //DESERT
     desert.setVolume(0);
     desert.play();
@@ -537,14 +452,12 @@ function sound(){
     visualizationOn = true;
     // colorMode = 4;
     colorMode = 1;
-    loop();
   } else if(incoming == "C"){ //FOREST
     forest.setVolume(0);
     forest.play();
     forest.setVolume(.8, delayInSeconds);
     visualizationOn = true;
     colorMode = 5;
-    loop();
   } else if(incoming == "D"){ //THUNDERSTORM
     thunderstorm.setVolume(0);
     thunderstorm.play();
@@ -552,7 +465,6 @@ function sound(){
     visualizationOn = true;
     // colorMode = 3;
     colorMode = 4;
-    loop();
   } else if(incoming == "E"){ //UNDERWATER
     underwater.setVolume(0);
     underwater.play();
@@ -560,35 +472,19 @@ function sound(){
     visualizationOn = true;
     // colorMode = 2;
     colorMode = 3;
-    loop();
-  } else if(incoming == "0"){ 
+  } else if(incoming == "0"){
     // background(0,0,0);
     visualizationOn = false;
     console.log("Turn down signal received");
-    
-    fadeBack();
-    noLoop();
-    // resetSketch();
-
   } 
   if (visualizationOn){
     bowls.play();
-    bowls.setVolume(.5, delayInSeconds);
+    bowls.setVolume(.7, delayInSeconds);
     console.log("Bowls playing");
   } else {
     bowls.setVolume(0, delayInSeconds);
     console.log("Fading bowls down");
     window.setTimeout(()=>{bowls.stop(); console.log("bowls off");}, delayInMillis);
-  }
-}
-
-function fadeBack(){
-  var transparency;
-  console.log("hello fadeback")
-  for(transparency = 0; transparency <= 255; transparency++){
-    fill(255, 0, 0);
-    rect(0, 0, width, height);
-    console.log(transparency);
   }
 }
 
@@ -639,7 +535,7 @@ function flow(){
     particle[i].edges();
   }
 
-  //fr.html(floor(frameRate()));
+  fr.html(floor(frameRate()));
     // print(frameCount);
   if(time > 1000){
       for(var j = 0; j < particle2.length; j++){
@@ -721,7 +617,7 @@ function newPattern(){
   noStroke();
   translate(width / 2, height / 2); // original translation
   if (animate == true){
-    number = time - 940;     
+    number = frameCount - 940;     
   }
   var goldenAngle = PI * (3.0 - sqrt(5));
   rotate(time);
@@ -733,7 +629,25 @@ function newPattern(){
     // draw ellipse
     ellipse(0, 0, radius);
   }
-  time += 0.005; 
+  time += 0.005;
+}
+
+function resetSketch(){
+  //lap = 1;
+  noLoop();
+  columns = floor(width / scl);
+  rows = floor(height / scl);
+  fr = createP('');
+  
+  flowField = new Array(columns * rows);
+  
+  for(var i = 0; i < 800; i++){
+     particle[i] = new Particle();
+     particle2[i] = new Particle();
+     particle3[i] = new Particle();
+  }
+  
+  frameRate(30); // 30 fps --> 1800 fpm
 }
 
 function Particle(){
@@ -796,32 +710,4 @@ function Particle(){
       this.updatePrev();
     }
   }
-}
-
-function resetSketch(){
-  //lap = 1;
-  noLoop();
-  columns = floor(width / scl);
-  rows = floor(height / scl);
-  fr = createP('');
-  
-  flowField = new Array(columns * rows);
-  
-  for(var i = 0; i < 800; i++){
-     particle[i] = new Particle();
-     particle2[i] = new Particle();
-     particle3[i] = new Particle();
-  }
-  
-  frameRate(30); // 30 fps --> 1800 fpm
-}
-
-function visOn(){
-  resetSketch();
-  loop();
-}
-
-function visOff(){
-  time = 0;
-  noLoop();
 }
